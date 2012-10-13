@@ -77,7 +77,7 @@ def to_source(node, indent_with=' ' * 4, add_line_information=False):
     """
     generator = SourceGenerator(indent_with, add_line_information)
     generator.visit(node)
-    return ''.join(generator.result)
+    return ''.join(str(s) for s in generator.result)
 
 
 class SourceGenerator(NodeVisitor):
@@ -123,6 +123,7 @@ class SourceGenerator(NodeVisitor):
 
     def signature(self, node):
         want_comma = []
+
         def write_comma():
             if want_comma:
                 self.write(', ')
@@ -195,6 +196,7 @@ class SourceGenerator(NodeVisitor):
 
     def visit_ClassDef(self, node):
         have_args = []
+
         def paren_or_comma():
             if have_args:
                 self.write(', ')
@@ -328,8 +330,11 @@ class SourceGenerator(NodeVisitor):
 
     def visit_Return(self, node):
         self.newline(node)
-        self.write('return ')
-        self.visit(node.value)
+        if node.value:
+            self.write('return ')
+            self.visit(node.value)
+        else:
+            self.write('return')
 
     def visit_Break(self, node):
         self.newline(node)
@@ -366,6 +371,7 @@ class SourceGenerator(NodeVisitor):
 
     def visit_Call(self, node):
         want_comma = []
+
         def write_comma():
             if want_comma:
                 self.write(', ')
